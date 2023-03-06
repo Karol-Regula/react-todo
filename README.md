@@ -8,11 +8,9 @@ This app is the result of me learning how to use React, .NET, and SQL Server, an
 - Learn how to use ASP.NET, entity framework, and SQL Server
 
 ## Getting Started
-Prerequisites: node.js installed
+prerequisites: docker installed  
 
-1. `npm install`  
-2. `npm run start`
-3. navigate to the url returned by the parcel server (`http://localhost:1234/` by default)
+Open using VS Code.
 
 ## Techincal stack
 Docker  
