@@ -1,0 +1,43 @@
+version: '3.8'
+
+name: todo-local
+
+services:
+  backend:
+    build:
+      context: ./../..
+      dockerfile: ./docker/local/Backend.Dockerfile
+    volumes:
+      - ../..:/repo:cached
+    ports:
+      - 8000:80
+    environment:
+      # Used by api/app/build-info endpoint
+      - GIT_SHA=${GIT_SHA}
+    stdin_open: true # docker run -i
+    tty: true # docker run -t
+    init: true # https://github.com/microsoft/vscode-dev-containers/blob/main/script-library/docs/docker.md
+
+  frontend:
+    build:
+      context: ./../..
+      dockerfile: ./docker/local/Frontend.Dockerfile
+    volumes:
+      - ../..:/repo:cached
+    restart: always
+    ports:
+      - 1234:1234
+
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    volumes:
+      - mssql:/var/opt/mssql
+    ports:
+      - 1434:1433
+    environment:
+      - ACCEPT_EULA=yes
+      - MSSQL_SA_PASSWORD=nevoAdmin1234
+
+volumes:
+  node_modules:
+  mssql:

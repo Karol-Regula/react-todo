@@ -1,0 +1,11 @@
+version: '3.8'
+
+name: todo-dev
+
+services:
+  app:
+    build:
+      context: ./../..
+      dockerfile: ./docker/dev/Dockerfile
+    ports:
+      - 8100:80
