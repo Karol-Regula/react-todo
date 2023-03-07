@@ -1,16 +1,16 @@
 import React from "react";
-import { useSetRecoilState, useRecoilValue } from "recoil";
-import { todoListState } from "../TodoState/TodoState";
-import { deleteTodo } from "../TodoItem/TodoItem"
+import { useSetRecoilState, useRecoilValue, SetterOrUpdater } from "recoil";
+import { Todo, todoListState } from "../TodoState/TodoState";
 import "./TodoClear.scss";
+import api from '../../lib/api';
 
 export function TodoListClear() {
-  const setTodoList = useSetRecoilState(todoListState);
-  const todoList = useRecoilValue(todoListState);
+  const setTodoList: SetterOrUpdater<Todo[]> = useSetRecoilState(todoListState);
+  const todoList: Todo[] = useRecoilValue(todoListState);
 
-  const clearTodos = () => {
+  const clearTodos = (): void => {
     for (var todo in todoList){
-      deleteTodo(todoList[todo].databaseId);
+      api.deleteTodo(todoList[todo]);
     }
     setTodoList((oldTodoList) => []);
   };

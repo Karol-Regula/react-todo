@@ -1,26 +1,29 @@
 # React ToDo
 
-This app is the result of me learning how to use React, .NET, and SQL Server, and Docker. I'm using Recoil and TypeScript in conjunction with React for a frontend. The backend consists of a .NET API and a SQL Server database managed through entity framework. The entire app is dockerized. 
+![preview gif](preview2.gif)
+
+This is a todo app built using React, .NET, SQL Server, and Docker. It features stateful and persistent editing, completing, and deleting of todos.
 
 ## Goals:
-- Create a responsive ToDo app with state using React. The Recoil [basic tutorial](https://recoiljs.org/docs/basic-tutorial/intro) served as a base for learning how to use a state library. 
-- Learn how to use Flexbox and CSS animations.
-- Learn how to use ASP.NET, entity framework, and SQL Server
+- Create a responsive ToDo app using React. The Recoil [basic tutorial](https://recoiljs.org/docs/basic-tutorial/intro) served as a base for state management.
+- Utilize Flexbox and CSS animations.
+- Utilize ASP.NET, Entity Framework, and SQL Server for a persistent backend
 
 ## Getting Started
-prerequisites: docker installed  
+Prerequisites: [Docker](https://www.docker.com/)
 
-Open using VS Code.
+1. Clone the repository
+2. `$ cd docker/dev`
+3. `$ docker compose up`
 
 ## Techincal stack
-Docker  
-ASP.NET  
-SQL Server (using Entity Framework)  
-node.js  
-TypeScript
-React  
-Recoil (state management)  
-Sass
+- Sass  
+- React (Recoil)  
+- TypeScript  
+- ASP.NET (Entity Framework)  
+- SQL Server (using Entity Framework)  
+- Docker  
 
-## Preview
-![Alt Text](preview.gif)
+## Improvment Opportunties
+- Offline Editing
+- Integration Testing

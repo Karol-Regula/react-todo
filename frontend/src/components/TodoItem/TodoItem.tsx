@@ -1,58 +1,51 @@
-import React from "react";
-import { useRecoilState } from "recoil";
-import { todoListState } from "../TodoState/TodoState";
-import "./TodoItem.scss";
+import React, { ReactElement } from 'react';
+import { SetterOrUpdater, useRecoilState } from 'recoil';
+import api from '../../lib/api';
+import { Todo, todoListState } from '../TodoState/TodoState';
+import './TodoItem.scss';
 
-export function TodoItem({ item }) {
-  const [todoList, setTodoList] = useRecoilState(todoListState); // todoList is the state (array of items), setTodoList is a setter
-  const index = todoList.findIndex((listItem) => listItem === item); // find the index of the item that will be operated on
-  const myRef = React.createRef<HTMLInputElement>();
+export function TodoItem({ item }): ReactElement {
+  const [todoList, setTodoList]: [Todo[], SetterOrUpdater<Todo[]>] = useRecoilState(todoListState); // todoList is the state (array of items), setTodoList is a setter
+  const index: number = todoList.findIndex((listItem) => listItem === item); // find the index of the item that will be operated on
+  const myRef: React.RefObject<HTMLInputElement> = React.createRef<HTMLInputElement>();
 
-  let className = item.animate ? "todo-item-animate" : "todo-item";
+  let className: string = item.animate ? 'todo-item-animate' : 'todo-item';
 
-  const editItemText = ({ target: { value } }) => {
-    // when item text is modified, this is called
-    const newList = replaceItemAtIndex(todoList, index, {
+  const editItemText = ({ target: { value } }): void => {
+    const newList: Todo[] = replaceItemAtIndex(todoList, index, {
       // replace the item at the index with item, text is replaced
       ...item,
       text: value,
     });
     setTodoList(newList); // update list with new list
-    editTodo(item.databaseId, value);
+    api.updateTodo(item.id, value);
   };
 
-  const toggleItemCompletion = () => {
-    const newList = replaceItemAtIndex(todoList, index, {
+  const toggleItemCompletion = (): void => {
+    const newList: Todo[] = replaceItemAtIndex(todoList, index, {
       ...item,
       isComplete: !item.isComplete,
     });
     setTodoList(newList);
-
-    let complete;
-    if (item.isComplete) {
-      complete = 0;
-    } else {
-      complete = 1;
-    }
-    completeTodo(item.databaseId, complete);
+    api.updateTodo(item.id, undefined, !item.isComplete);
   };
 
-  const deleteItem = () => {
-    const newList = removeItemAtIndex(todoList, index);
+  const deleteItem = (): void => {
+    const newList: Todo[] = removeItemAtIndex(todoList, index);
     setTodoList(newList);
-    deleteTodo(item.databaseId);
+    api.deleteTodo(item);
   };
 
-  const editItem = (ref: React.RefObject<HTMLInputElement>) => {
+  const editItem = (ref: React.RefObject<HTMLInputElement>): void => {
     if (ref.current != null) {
       ref.current.focus();
     }
   };
 
-  let style;
+  let style: any;
   if (item.isComplete) {
     style = {
-      textDecoration: "line-through",
+      textDecoration: 'line-through',
     };
   }
 
@@ -97,63 +90,12 @@ export function TodoItem({ item }) {
   );
 }
 
-function replaceItemAtIndex(arr, index, newValue) {
+function replaceItemAtIndex(arr, index, newValue): Todo[] {
   // use slicing and spread syntax to replace an item
   return [...arr.slice(0, index), newValue, ...arr.slice(index + 1)];
 }
 
-function removeItemAtIndex(arr, index) {
+function removeItemAtIndex(arr, index): Todo[] {
   // use slicing and spread syntax to remove an item
   return [...arr.slice(0, index), ...arr.slice(index + 1)];
-}
-
-export async function deleteTodo(todoId) {
-  await fetch(`http://localhost:8000/api/todos/deleteTodo/?todoId=${todoId}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json; charset=UTF-8" },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
-
-async function completeTodo(todoId, isComplete) {
-  await fetch(
-    `http://localhost:8000/api/todos/completeTodo/?todoId=${todoId}&isComplete=${isComplete}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json; charset=UTF-8" },
-    }
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
-
-async function editTodo(todoId, todoText) {
-  await fetch(
-    `http://localhost:8000/api/todos/editTodo/?todoId=${todoId}&todoText=${todoText}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json; charset=UTF-8" },
-    }
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
 }

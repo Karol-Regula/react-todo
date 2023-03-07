@@ -1,34 +1,35 @@
-import React, { ReactElement, useState } from "react";
-import { useSetRecoilState } from "recoil";
-import { todoListState } from "../TodoState/TodoState";
-import "./TodoCreate.scss";
+import React, { ReactElement, useState } from 'react';
+import { SetterOrUpdater, useSetRecoilState } from 'recoil';
+import Api from '../../lib/api';
+import { Todo, todoListState } from '../TodoState/TodoState';
+import './TodoCreate.scss';
 
 export function TodoItemCreator(): ReactElement {
   // used to create a todo item, houses the main onChange function which calls the setInputValue
-  const [inputValue, setInputValue] = useState(""); // use an empty string as state, variable called inputValue, setter function
-  const setTodoList = useSetRecoilState(todoListState); // returns a function that can be used to set the state
+  const [inputValue, setInputValue] = useState(''); // use an empty string as state, variable called inputValue, setter function
+  const setTodoList: SetterOrUpdater<Todo[]> = useSetRecoilState(todoListState); // returns a function that can be used to set the state
 
-  const addItem = async () => {
-    let response = await sendTodo(inputValue, 0);
-    setTodoList((oldTodoList) => [
-      {
-        id: getId(),
-        text: inputValue,
-        isComplete: false,
-        databaseId: response,
-        animate: true,
-      },
-      ...oldTodoList,
-    ]);
-    setInputValue("");
+  const addItem = async (): Promise<void> => {
+    const todo: Todo = {
+      _id: getId(),
+      text: inputValue,
+      isComplete: false,
+      animate: true,
+    };
+
+    let response: Todo = await Api.createTodo(todo);
+    todo.id = response.id;
+
+    setTodoList((oldTodoList) => [todo, ...oldTodoList]);
+    setInputValue('');
   };
 
-  const onChange = ({ target: { value } }) => {
+  const onChange = ({ target: { value } }): void => {
     setInputValue(value);
   };
 
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
+  const handleKeyDown = (event): void => {
+    if (event.key === 'Enter') {
       addItem();
     }
   };
@@ -47,28 +48,7 @@ export function TodoItemCreator(): ReactElement {
   );
 }
 
-let id = 0;
-export function getId() {
-  // create unique ids
-  return id++;
-}
-
-async function sendTodo(todoText, isComplete) {
-  const response = await fetch(
-    `http://localhost:8000/api/todos/createTodo/?todoText=${todoText}&isComplete=${isComplete}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json; charset=UTF-8" },
-    }
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-      return response.json();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  return response;
+let _id: number = 0;
+export function getId(): number {
+  return _id++;
 }

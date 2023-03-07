@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System;
 
 using Todo.Api.Models;
 
@@ -24,7 +23,7 @@ namespace Todo.Api.Controllers
          _dbContext = dbContext;
       }
 
-      [HttpGet("all")]
+      [HttpGet]
       public List<TodoItem> Get()
       {
          _logger.LogInformation("Getting all todos");
@@ -32,47 +31,46 @@ namespace Todo.Api.Controllers
          return todo;
       }
 
-      [HttpPost("createTodo")]
-      public int PostQueryCreate(string todoText, int isComplete)
+      [HttpPost]
+      public TodoItem PostQueryCreate(TodoItem todoReceived)
       {
-         var todo = new TodoItem { Text = $"{todoText}", IsComplete = isComplete };
-         _dbContext.Add(todo);
+         _dbContext.Add(todoReceived);
          _dbContext.SaveChanges();
-         return todo.Id;
+         Response.StatusCode = 201;
+         return todoReceived;
       }
 
-      [HttpPost("editTodo")]
-      public void PostQueryEdit(int todoId, string todoText)
+      [HttpPut("{Id}")]
+      public TodoItem PutQueryEdit(int Id, TodoFields todoFields)
       {
-         var todoo = _dbContext.Todos.First(todo => todo.Id == todoId);
-         if (todoo != null)
+         var todoEdited = _dbContext.Todos.First(todo => todo.Id == Id);
+         if (todoEdited != null)
          {
-            todoo.Text = todoText;
+            if (!(todoFields.Text is null))
+            {
+               todoEdited.Text = todoFields.Text;
+            }
+            if (!(todoFields.IsComplete is null))
+            {
+               todoEdited.IsComplete = todoFields.IsComplete.Value;
+            }
             _dbContext.SaveChanges();
          }
-         return;
-      }
-
-      [HttpPost("completeTodo")]
-      public void PostQueryComplete(int todoId, int isComplete)
-      {
-         var todo = _dbContext.Todos.First(todo => todo.Id == todoId);
-         if (todo != null)
+         else
          {
-            todo.IsComplete = isComplete;
-            _dbContext.SaveChanges();
+            Response.StatusCode = 404;
          }
-         return;
+         return todoEdited;
       }
 
-      [HttpPost("deleteTodo")]
-      public void PostQueryDelete(int todoId)
+      [HttpDelete("{Id}")]
+      public TodoItem DeleteQueryDelete(int Id)
       {
-         var todo = new TodoItem { Id = todoId };
+         var todo = new TodoItem { Id = Id };
          _dbContext.Todos.Attach(todo);
          _dbContext.Todos.Remove(todo);
          _dbContext.SaveChanges();
-         return;
+         return todo;
       }
    }
 }
